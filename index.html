@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/icons8-money-transfer-96.png" type="image/x-icon">
+    <title>Quick Compound Interest Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #1b1b1b;
+            font-size: 16px;
+            color: aliceblue;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #1b1b1b;
+            color: aliceblue;
+            border: 1px solid #ccc;
+        }
+        .results {
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quick Compound Interest Calculator</h1>
+        <label for="currency">Currency:</label>
+        <select id="currency">
+            <option value="USD">$ (USD)</option>
+            <option value="EUR">€ (EUR)</option>
+            <option value="GBP">£ (GBP)</option>
+            <option value="JPY">¥ (JPY)</option>
+            <option value="INR">₹ (INR)</option>
+            <option value="BTC">₿ (BTC)</option>
+            <option value="ETH">Ξ (ETH)</option>
+            <option value="LTC">Ł (LTC)</option>
+            <option value="BNB">₿ (BNB)</option>
+            <option value="DOGE">Ð (DOGE)</option>
+            <option value="ADA">₳ (ADA)</option>
+            <option value="SOL">◎ (SOL)</option>
+            <option value="XRP">₭ (XRP)</option>
+            <option value="DOT">● (DOT)</option>
+            <option value="USDT">$ (USDT)</option>
+            <option value="AUD">A$ (AUD)</option>
+            <option value="CAD">C$ (CAD)</option>
+            <option value="CHF">₣ (CHF)</option>
+            <option value="CNY">¥ (CNY)</option>
+            <option value="KRW">₩ (KRW)</option>
+            <option value="RUB">₽ (RUB)</option>
+            <option value="SGD">S$ (SGD)</option>
+            <!-- Add more currencies as needed -->
+        </select>
+
+        <label for="principal">Principal Amount:</label>
+        <input type="number" id="principal" value="1000" min="0" step="0.01">
+
+        <label for="regularDeposit">Regular Deposit Amount:</label>
+        <input type="number" id="regularDeposit" value="100" min="0" step="0.01">
+
+        <label for="regularDepositFrequency">Regular Deposit Frequency:</label>
+        <select id="regularDepositFrequency">
+            <option value="365">Daily</option>
+            <option value="52">Weekly</option>
+            <option value="12">Monthly</option>
+            <option value="4">Quarterly</option>
+            <option value="2">Semi-Annually</option>
+            <option value="1">Yearly</option>
+        </select>
+
+        <label for="rate">Annual Interest Rate (%):</label>
+        <input type="number" id="rate" value="5" min="0" step="0.01">
+
+        <label for="compoundFrequency">Compound Frequency:</label>
+        <select id="compoundFrequency">
+            <option value="365">Daily</option>
+            <option value="52">Weekly</option>
+            <option value="12">Monthly</option>
+            <option value="4">Quarterly</option>
+            <option value="2">Semi-Annually</option>
+            <option value="1">Yearly</option>
+        </select>
+
+        <label for="periodValue">Investment Period:</label>
+        <input type="number" id="periodValue" value="10" min="0">
+
+        <label for="periodUnit">Period Unit:</label>
+        <select id="periodUnit">
+            <option value="1">Years</option>
+            <option value="12">Months</option>
+            <option value="52">Weeks</option>
+            <option value="365">Days</option>
+        </select>
+
+        <label for="inflation">Inflation Rate (%):</label>
+        <input type="number" id="inflation" value="6" min="0" step="0.01">
+
+        <div class="results">
+            <p>Total Investment: <span id="totalInvestment">-</span></p>
+            <p>Total Value: <span id="totalValue">-</span></p>
+            <p>Interest Earned: <span id="interestEarned">-</span></p>
+            <p>Inflation-Adjusted Value: <span id="inflationAdjustedValue">-</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Helper function to calculate compound interest
+        function calculateCompoundInterest() {
+    const currency = document.getElementById("currency").value;
+    const principal = parseFloat(document.getElementById("principal").value) || 0;
+    const regularDeposit = parseFloat(document.getElementById("regularDeposit").value) || 0;
+    const depositFreq = parseInt(document.getElementById("regularDepositFrequency").value);
+    const annualRate = parseFloat(document.getElementById("rate").value) / 100;
+    const compFreq = parseInt(document.getElementById("compoundFrequency").value);
+    const periodValue = parseInt(document.getElementById("periodValue").value);
+    const periodUnit = parseInt(document.getElementById("periodUnit").value);
+    const inflationRate = parseFloat(document.getElementById("inflation").value) / 100;
+
+    // Calculate the total time in years
+    const timeInYears = periodValue / periodUnit;
+
+    // Compound interest formula
+    let total = principal;
+    const totalPeriods = timeInYears * compFreq;
+
+    for (let i = 0; i < totalPeriods; i++) {
+        total += regularDeposit * (depositFreq / compFreq);
+        total += total * (annualRate / compFreq);
+    }
+
+    const totalInvestment = principal + (regularDeposit * timeInYears * depositFreq);
+    const interestEarned = total - totalInvestment;
+
+    // Adjust for inflation
+    const inflationMultiplier = Math.pow(1 + inflationRate, timeInYears);
+    const inflationAdjustedValue = total / inflationMultiplier;
+
+            document.getElementById("totalInvestment").textContent = `${currency} ${totalInvestment.toFixed(2)}`;
+            document.getElementById("totalValue").textContent = `${currency} ${total.toFixed(2)}`;
+            document.getElementById("interestEarned").textContent = `${currency} ${interestEarned.toFixed(2)}`;
+            document.getElementById("inflationAdjustedValue").textContent = `${currency} ${inflationAdjustedValue.toFixed(2)}`;
+        }
+
+        // Attach event listeners
+        document.querySelectorAll("input, select").forEach(element => {
+            element.addEventListener("input", calculateCompoundInterest);
+        });
+
+        // Initial calculation
+        calculateCompoundInterest();
+    </script>
+</body>
+</html>
